@@ -17,7 +17,7 @@
           lib.filter (host: host != config.networking.hostName) cfg.hosts
         );
 
-        # `nix-servant serve`/`stop` toggles this host's cache. `nix-servant client`
+        # `nix-servant serve`/`stop` toggles this host's cache. `nix-servant dine`
         # opens a shell (or runs a command) that uses the caches of the hosts that are up
         nix-servant =
           pkgs.writers.writeFishBin "nix-servant" # fish
@@ -27,7 +27,7 @@
                       sudo systemctl start nix-serve && echo "Serving http://${config.networking.hostName}.local:${port}"
                   case stop
                       sudo systemctl stop nix-serve
-                  case client
+                  case dine
                       for url in ${toString cacheUrls}
                           if ${lib.getExe pkgs.curl} --silent --fail --max-time 2 $url/nix-cache-info >/dev/null
                               set -a urls $url
@@ -46,7 +46,7 @@
                           exec $SHELL
                       end
                   case '*'
-                      echo "Usage: nix-servant serve | stop | client [command...]" >&2
+                      echo "Usage: nix-servant serve | stop | dine [command...]" >&2
                       exit 1
               end
             '';
@@ -79,7 +79,7 @@
 
           environment.systemPackages = [ nix-servant ];
 
-          # Client. Opt-in with `nix-servant client`, since the other hosts are usually off
+          # Client. Opt-in with `nix-servant dine`, since the other hosts are usually off
           nix.settings.trusted-substituters = cacheUrls;
         };
       };
