@@ -36,7 +36,7 @@ nix-servant figures out which of your other hosts are currently online, and ther
 
 ```sh
 nix-servant serve            # start this machine's cache
-nix-servant stop             # stop it
 nix-servant dine             # open a shell that uses the caches that are up
+nix-servant stop             # stop the serving/dining
 nix-servant dine nix build   # or run a single command with them
 ```
