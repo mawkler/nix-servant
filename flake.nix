@@ -75,6 +75,8 @@
             openFirewall = true;
             # A faster drop-in replacement. Override with `services.nix-serve.package`
             package = lib.mkDefault pkgs.nix-serve-ng;
+            # Override with `services.nix-serve.secretKeyFile`
+            secretKeyFile = lib.mkDefault "/etc/nix/cache.sec";
           };
 
           # Don't start nix-serve at boot

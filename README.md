@@ -1,21 +1,32 @@
 # nix-servant
 
-A small NixOS module that wraps [nix-serve](https://github.com/edolstra/nix-serve)/[nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) and gives it a convenient little CLI. nix-serve lets machines on the same LAN can share their Nix stores as binary caches.
+Wraps [nix-serve](https://github.com/edolstra/nix-serve)/[nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) and gives it a convenient little CLI. nix-serve lets machines on the same LAN share their Nix stores as binary caches.
 
 ## Setup
+
+On each machine, generate a signing key and print its public key:
+
+```sh
+sudo nix-store --generate-binary-cache-key $(hostname)-1 /etc/nix/cache.sec /etc/nix/cache.pub
+cat /etc/nix/cache.pub
+```
+
+Then add this to every machine's config, for example by sending it to them using [croc](https://github.com/schollz/croc):
 
 ```nix
 {
    services.nix-servant = {
     enable = true;
-    hosts = [ "my-laptop" "my-desktop" ]; # put your host names here
+    # Put your host names here
+    hosts = [ "my-laptop" "my-desktop" ];
   };
+
+  # Put your machines' public keys here
+  nix.settings.trusted-public-keys = [ "my-laptop-1:..." "my-desktop-1:..." ];
 }
 ```
 
-Every machine in `hosts` is reached as `<host>.local` over mDNS (Avahi).
-
-The server is [nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) by default. To use the original nix-serve instead, set `services.nix-serve.package = pkgs.nix-serve;`.
+Every machine in `hosts` is reachable as `<host>.local` over mDNS ([avahi](https://github.com/avahi/avahi)).
 
 ## Usage
 
