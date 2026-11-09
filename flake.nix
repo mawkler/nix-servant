@@ -65,6 +65,8 @@
           services.nix-serve = {
             enable = true;
             openFirewall = true;
+            # A faster drop-in replacement. Override with `services.nix-serve.package`
+            package = lib.mkDefault pkgs.nix-serve-ng;
           };
 
           # Don't start nix-serve at boot

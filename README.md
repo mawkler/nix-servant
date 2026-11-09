@@ -1,6 +1,6 @@
 # nix-servant
 
-A small NixOS module that wraps [nix-serve](https://github.com/edolstra/nix-serve) and gives it a convenient little CLI. nix-serve lets machines on the same LAN can share their Nix stores as binary caches.
+A small NixOS module that wraps [nix-serve](https://github.com/edolstra/nix-serve)/[nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) and gives it a convenient little CLI. nix-serve lets machines on the same LAN can share their Nix stores as binary caches.
 
 ## Setup
 
@@ -14,6 +14,8 @@ A small NixOS module that wraps [nix-serve](https://github.com/edolstra/nix-serv
 ```
 
 Every machine in `hosts` is reached as `<host>.local` over mDNS (Avahi).
+
+The server is [nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) by default. To use the original nix-serve instead, set `services.nix-serve.package = pkgs.nix-serve;`.
 
 ## Usage
 
