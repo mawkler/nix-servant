@@ -47,7 +47,7 @@
                       end
                       echo "Using binary caches: $urls"
                       # Picked up by every `nix` command, which forwards it to the daemon
-                      set -gx NIX_CONFIG "extra-substituters = $urls"
+                      set -gx NIX_CONFIG "$NIX_CONFIG"\n"extra-substituters = $urls"
                       # `exec` keeps the PID, so this is the PID of the dine shell or command
                       set -gx NIX_SERVANT_DINER $fish_pid
                       if set -q argv[2]
