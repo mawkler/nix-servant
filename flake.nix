@@ -20,8 +20,7 @@
         );
 
         # `nix-servant serve`/`stop` toggles this host's cache. `nix-servant dine`
-        # opens a shell (or runs a command) that uses the caches of the hosts that are up.
-        # `stop` inside that shell leaves it instead
+        # opens a shell (or runs a command) that uses the caches of the hosts that are up
         nix-servant =
           pkgs.writers.writeFishBin "nix-servant" # fish
             ''
@@ -29,12 +28,7 @@
                   case serve
                       sudo ${systemctl} start nix-serve && echo "Serving http://${config.networking.hostName}.local:${port}"
                   case stop
-                      if set -q NIX_SERVANT_DINER
-                          # A child can't change its parent shell's env, so end the dine shell
-                          kill -HUP $NIX_SERVANT_DINER && echo "Stopped dining"
-                      else
-                          sudo ${systemctl} stop nix-serve
-                      end
+                      sudo ${systemctl} stop nix-serve
                   case dine
                       for url in ${toString cacheUrls}
                           if ${lib.getExe pkgs.curl} --silent --fail --max-time 2 $url/nix-cache-info >/dev/null
@@ -48,8 +42,6 @@
                       echo "Using binary caches: $urls"
                       # Picked up by every `nix` command, which forwards it to the daemon
                       set -gx NIX_CONFIG "$NIX_CONFIG"\n"extra-substituters = $urls"
-                      # `exec` keeps the PID, so this is the PID of the dine shell or command
-                      set -gx NIX_SERVANT_DINER $fish_pid
                       if set -q argv[2]
                           exec $argv[2..]
                       else

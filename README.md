@@ -1,6 +1,6 @@
 # nix-servant
 
-Wraps [nix-serve](https://github.com/edolstra/nix-serve)/[nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) and gives it a convenient little CLI. nix-serve lets machines on the same LAN share their Nix stores as binary caches.
+Wraps [nix-serve](https://github.com/edolstra/nix-serve)/[nix-serve-ng](https://github.com/aristanetworks/nix-serve-ng) and gives it a convenient CLI. nix-serve lets machines on the same LAN share their Nix stores as binary caches.
 
 ## Setup
 
@@ -15,7 +15,7 @@ Then add this to every machine's config, for example by sending it to them using
 
 ```nix
 {
-   services.nix-servant = {
+  services.nix-servant = {
     enable = true;
     # Put your host names here
     hosts = [ "my-laptop" "my-desktop" ];
@@ -54,7 +54,7 @@ To rebuild NixOS while dining, run `nixos-rebuild switch --sudo`. `sudo nixos-re
 
 ```sh
 nix-servant serve            # start this machine's cache
-nix-servant dine             # open a shell that uses the caches that are up
-nix-servant stop             # stop the serving/dining
+nix-servant dine             # enter a shell that uses the caches that are up, until you `exit`
+nix-servant stop             # stop this machine's cache
 nix-servant dine nix build   # or run a single command with them
 ```
