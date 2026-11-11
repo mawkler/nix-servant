@@ -28,6 +28,8 @@ Then add this to every machine's config, for example by sending it to them using
 
 Every machine in `hosts` is reachable as `<host>.local` over mDNS ([avahi](https://github.com/avahi/avahi)).
 
+To `serve` without typing your password, set `services.nix-servant.passwordless = true`. This only works for users in `wheel`.
+
 ## Usage
 
 With two machines, `my-desktop` and `my-laptop`, where `my-laptop` should use `my-desktop`'s store as a binary cache:
@@ -42,6 +44,11 @@ nix build
 ```
 
 nix-servant figures out which of your other hosts are currently online, and therefore avoids trying to fetch from any offline machine.
+
+To rebuild NixOS while dining, run `nixos-rebuild switch --sudo`. `sudo nixos-rebuild switch` won't use the caches, because sudo drops the setting that points Nix at them.
+
+> [!WARNING]
+> While serving, anyone on the network can download any path in your Nix store if they know its hash. Don't serve on untrusted networks, and keep secrets out of the store.
 
 ### All commands
 

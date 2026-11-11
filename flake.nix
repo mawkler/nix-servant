@@ -13,6 +13,8 @@
       let
         cfg = config.services.nix-servant;
         port = toString config.services.nix-serve.port;
+        # The full path, so it matches the `passwordless` sudo rule exactly
+        systemctl = "${config.systemd.package}/bin/systemctl";
         cacheUrls = map (host: "http://${host}.local:${port}") (
           lib.filter (host: host != config.networking.hostName) cfg.hosts
         );
@@ -25,13 +27,13 @@
             ''
               switch "$argv[1]"
                   case serve
-                      sudo systemctl start nix-serve && echo "Serving http://${config.networking.hostName}.local:${port}"
+                      sudo ${systemctl} start nix-serve && echo "Serving http://${config.networking.hostName}.local:${port}"
                   case stop
                       if set -q NIX_SERVANT_DINER
                           # A child can't change its parent shell's env, so end the dine shell
                           kill -HUP $NIX_SERVANT_DINER && echo "Stopped dining"
                       else
-                          sudo systemctl stop nix-serve
+                          sudo ${systemctl} stop nix-serve
                       end
                   case dine
                       for url in ${toString cacheUrls}
@@ -66,6 +68,7 @@
             type = lib.types.listOf lib.types.str;
             description = "Hostnames of all the machines, reached as `<host>.local`. This one is skipped";
           };
+          passwordless = lib.mkEnableOption "`nix-servant serve`/`stop` without a password, for users in `wheel`";
         };
 
         config = lib.mkIf cfg.enable {
@@ -90,6 +93,31 @@
           };
 
           environment.systemPackages = [ nix-servant ];
+
+          # Lets `wheel` run exactly `systemctl start/stop nix-serve` as root without a password.
+          # Set for both sudo implementations, since only the enabled one reads its rules
+          security =
+            let
+              rules = lib.mkIf cfg.passwordless [
+                {
+                  groups = [ "wheel" ];
+                  commands =
+                    map
+                      (verb: {
+                        command = "${systemctl} ${verb} nix-serve";
+                        options = [ "NOPASSWD" ];
+                      })
+                      [
+                        "start"
+                        "stop"
+                      ];
+                }
+              ];
+            in
+            {
+              sudo.extraRules = rules;
+              sudo-rs.extraRules = rules;
+            };
 
           # Client. Opt-in with `nix-servant dine`, since the other hosts are usually off
           nix.settings.trusted-substituters = cacheUrls;
