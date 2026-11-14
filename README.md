@@ -56,5 +56,6 @@ To rebuild NixOS while dining, run `nixos-rebuild switch --sudo`. `sudo nixos-re
 nix-servant serve            # start this machine's cache
 nix-servant dine             # enter a shell that uses the caches that are up, until you `exit`
 nix-servant stop             # stop this machine's cache
+nix-servant status           # show whether this machine is serving and dining
 nix-servant dine nix build   # or run a single command with them
 ```

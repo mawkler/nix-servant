@@ -47,8 +47,21 @@
                       else
                           exec $SHELL
                       end
+                  case status
+                      if ${systemctl} is-active --quiet nix-serve
+                          echo "Serving http://${config.networking.hostName}.local:${port}"
+                      end
+                      # `dine` leaves the caches it uses in NIX_CONFIG
+                      for url in ${toString cacheUrls}
+                          if string match -q -- "*$url*" "$NIX_CONFIG"
+                              set -a dining $url
+                          end
+                      end
+                      if set -q dining[1]
+                          echo "Dining from $dining"
+                      end
                   case '*'
-                      echo "Usage: nix-servant serve | stop | dine [command...]" >&2
+                      echo "Usage: nix-servant serve | stop | status | dine [command...]" >&2
                       exit 1
               end
             '';
